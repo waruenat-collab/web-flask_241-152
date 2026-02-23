@@ -39,3 +39,26 @@ from models import Restaurant
 def restaurants():
     data = Restaurant.query.all()
     return render_template('restaurants.html', restaurants=data)
+
+from flask import request, redirect, url_for
+from models import Restaurant
+
+@app.route('/add-restaurant', methods=['GET', 'POST'])
+def add_restaurant():
+    if request.method == 'POST':
+        name = request.form['name']
+        location = request.form['location']
+        description = request.form['description']
+
+        restaurant = Restaurant(
+            name=name,
+            location=location,
+            description=description
+        )
+
+        db.session.add(restaurant)
+        db.session.commit()
+
+        return redirect(url_for('restaurants'))
+
+    return render_template('add_restaurant.html')

@@ -20,8 +20,22 @@ def contact():
 from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
 
+from flask import Flask, render_template
+from models import db
+import os
+
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///food.db'
+basedir = os.path.abspath(os.path.dirname(__file__))
+
+app.config['SQLALCHEMY_DATABASE_URI'] = \
+    'sqlite:///' + os.path.join(basedir, 'food.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
+
+from models import Restaurant
+
+@app.route('/restaurants')
+def restaurants():
+    data = Restaurant.query.all()
+    return render_template('restaurants.html', restaurants=data)

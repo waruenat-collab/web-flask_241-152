@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>เพิ่มร้านอาหาร</h2>
+
+<form method="POST">
+    <label>ชื่อร้าน</label><br>
+    <input type="text" name="name" required><br><br>
+
+    <label>สถานที่</label><br>
+    <input type="text" name="location"><br><br>
+
+    <label>รายละเอียด</label><br>
+    <textarea name="description"></textarea><br><br>
+
+    <button type="submit">บันทึก</button>
+</form>
+{% endblock %}

@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>ร้านอาหาร</h2>
+
+<ul>
+{% for r in restaurants %}
+    <li>
+        <strong>{{ r.name }}</strong><br>
+        {{ r.location }}<br>
+        {{ r.description }}
+    </li>
+{% endfor %}
+</ul>
+{% endblock %}

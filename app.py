@@ -62,3 +62,8 @@ def add_restaurant():
         return redirect("/restaurants")
 
     return render_template("add_restaurant.html")
+
+@app.route("/restaurants")
+def restaurants():
+    all_restaurants = Restaurant.query.all()
+    return render_template("restaurants.html", restaurants=all_restaurants)

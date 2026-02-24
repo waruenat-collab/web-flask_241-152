@@ -43,22 +43,22 @@ def restaurants():
 from flask import request, redirect, url_for
 from models import Restaurant
 
-@app.route('/add-restaurant', methods=['GET', 'POST'])
+@app.route("/add-restaurant", methods=["GET", "POST"])
 def add_restaurant():
-    if request.method == 'POST':
-        name = request.form['name']
-        location = request.form['location']
-        description = request.form['description']
+    if request.method == "POST":
+        name = request.form["name"]
+        location = request.form["location"]
+        description = request.form["description"]
 
-        restaurant = Restaurant(
+        new_restaurant = Restaurant(
             name=name,
             location=location,
             description=description
         )
 
-        db.session.add(restaurant)
+        db.session.add(new_restaurant)
         db.session.commit()
 
-        return redirect(url_for('restaurants'))
+        return redirect("/restaurants")
 
-    return render_template('add_restaurant.html')
+    return render_template("add_restaurant.html")

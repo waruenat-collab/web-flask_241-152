@@ -10,3 +10,15 @@ body {
     background: white;
     padding: 20px;
 }
+
+body {
+    font-family: Arial, sans-serif;
+}
+
+nav a {
+    margin-right: 10px;
+}
+
+.container {
+    padding: 20px;
+}

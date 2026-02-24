@@ -1,17 +1,18 @@
-{% extends 'base.html' %}
-{% block content %}
-<h2>เพิ่มร้านอาหาร</h2>
+{% extends "base.html" %}
 
-<form method="POST">
-    <label>ชื่อร้าน</label><br>
+{% block content %}
+<h2>Add Restaurant</h2>
+
+<form method="post">
+    <label>Name</label><br>
     <input type="text" name="name" required><br><br>
 
-    <label>สถานที่</label><br>
+    <label>Location</label><br>
     <input type="text" name="location"><br><br>
 
-    <label>รายละเอียด</label><br>
+    <label>Description</label><br>
     <textarea name="description"></textarea><br><br>
 
-    <button type="submit">บันทึก</button>
+    <button type="submit">Save</button>
 </form>
 {% endblock %}

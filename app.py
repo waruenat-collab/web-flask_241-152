@@ -55,6 +55,13 @@ def edit_restaurant(id):
         return redirect(f"/restaurants/{id}")
     return render_template("edit_restaurant.html", restaurant=r)
 
+@app.route("/restaurants/<int:id>/delete")
+def delete_restaurant(id):
+    r = Restaurant.query.get_or_404(id)
+    db.session.delete(r)
+    db.session.commit()
+    return redirect("/restaurants")
+
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()

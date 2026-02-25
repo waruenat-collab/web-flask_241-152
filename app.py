@@ -26,6 +26,19 @@ def restaurants():
     data = Restaurant.query.all()
     return render_template("restaurants.html", restaurants=data)
 
+@app.route("/add-restaurant", methods=["GET", "POST"])
+def add_restaurant():
+    if request.method == "POST":
+        r = Restaurant(
+            name=request.form["name"],
+            location=request.form["location"],
+            description=request.form["description"]
+        )
+        db.session.add(r)
+        db.session.commit()
+        return redirect("/restaurants")
+    return render_template("add_restaurant.html")
+
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()

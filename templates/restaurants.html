@@ -4,14 +4,8 @@
 <h2>Restaurants</h2>
 
 <ul>
-    {% for r in restaurants %}
-        <li>
-            <strong>{{ r.name }}</strong><br>
-            {{ r.location }}<br>
-            {{ r.description }}
-        </li>
-    {% else %}
-        <li>No restaurants yet</li>
-    {% endfor %}
+{% for r in restaurants %}
+    <li>{{ r.name }} - {{ r.location }}</li>
+{% endfor %}
 </ul>
 {% endblock %}

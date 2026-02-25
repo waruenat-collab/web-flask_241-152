@@ -39,6 +39,22 @@ def add_restaurant():
         return redirect("/restaurants")
     return render_template("add_restaurant.html")
 
+@app.route("/restaurants/<int:id>")
+def restaurant_detail(id):
+    r = Restaurant.query.get_or_404(id)
+    return render_template("restaurant_detail.html", restaurant=r)
+
+@app.route("/restaurants/<int:id>/edit", methods=["GET", "POST"])
+def edit_restaurant(id):
+    r = Restaurant.query.get_or_404(id)
+    if request.method == "POST":
+        r.name = request.form["name"]
+        r.location = request.form["location"]
+        r.description = request.form["description"]
+        db.session.commit()
+        return redirect(f"/restaurants/{id}")
+    return render_template("edit_restaurant.html", restaurant=r)
+
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()

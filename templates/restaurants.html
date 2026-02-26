@@ -2,7 +2,11 @@
 {% for r in restaurants %}
     <li>
         <b>{{ r.name }}</b> - {{ r.location }}<br>
-        <a href="/edit-restaurant/{{ r.id }}">Edit</a>
+        <a href="/edit-restaurant/{{ r.id }}">Edit</a> |
+        <a href="/delete-restaurant/{{ r.id }}"
+           onclick="return confirm('Are you sure you want to delete this restaurant?');">
+           Delete
+        </a>
     </li>
 {% endfor %}
 </ul>

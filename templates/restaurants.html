@@ -12,29 +12,34 @@
         placeholder="Search restaurant..."
         value="{{ request.args.get('q', '') }}"
     >
-    <button>Search</button>
+    <button type="submit">Search</button>
 </form>
 
-<ul>
-{% for r in restaurants %}
-    <li>
-        <b>{{ r.name }}</b> - {{ r.location }}<br>
-
-        <a href="/restaurants/{{ r.id }}/edit">Edit</a> |
-
-        <!-- 🔒 Delete with POST -->
-        <form action="/restaurants/{{ r.id }}/delete"
-              method="post"
-              style="display:inline;"
-              onsubmit="return confirm('Are you sure you want to delete this restaurant?');">
-            <button type="submit">Delete</button>
-        </form>
-    </li>
-{% endfor %}
-</ul>
-
 {% if restaurants|length == 0 %}
-<p>No restaurants found.</p>
+    <!-- 🚫 Empty State -->
+    <div class="empty-state">
+        <p><strong>No restaurants found.</strong></p>
+        <p>Try adding a new restaurant or change your search keyword.</p>
+        <a href="/add-restaurant">➕ Add Restaurant</a>
+    </div>
+{% else %}
+    <ul>
+    {% for r in restaurants %}
+        <li>
+            <b>{{ r.name }}</b> - {{ r.location }}<br>
+
+            <a href="/restaurants/{{ r.id }}/edit">Edit</a> |
+
+            <!-- 🔒 Delete with POST -->
+            <form action="/restaurants/{{ r.id }}/delete"
+                  method="post"
+                  style="display:inline;"
+                  onsubmit="return confirm('Are you sure you want to delete this restaurant?');">
+                <button type="submit">Delete</button>
+            </form>
+        </li>
+    {% endfor %}
+    </ul>
 {% endif %}
 
 {% endblock %}

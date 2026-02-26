@@ -1,24 +1,33 @@
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f7f7f7;
-    margin: 0;
+.flash {
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 5px;
+    color: #fff;
 }
 
-.container {
-    width: 80%;
-    margin: auto;
-    background: white;
+.flash.success {
+    background-color: #4CAF50;
+}
+
+.flash.warning {
+    background-color: #ff9800;
+}
+
+.flash.danger {
+    background-color: #f44336;
+}
+
+.empty-state {
+    border: 1px dashed #ccc;
     padding: 20px;
+    text-align: center;
+    margin-top: 20px;
+    background-color: #f9f9f9;
 }
 
-body {
-    font-family: Arial, sans-serif;
-}
-
-nav a {
-    margin-right: 10px;
-}
-
-.container {
-    padding: 20px;
+.empty-state a {
+    display: inline-block;
+    margin-top: 10px;
+    text-decoration: none;
+    color: #007bff;
 }

@@ -49,7 +49,15 @@ def contact():
 
 @app.route("/restaurants")
 def restaurants():
-    data = Restaurant.query.all()
+    keyword = request.args.get("q")
+
+    if keyword:
+        data = Restaurant.query.filter(
+            Restaurant.name.contains(keyword)
+        ).all()
+    else:
+        data = Restaurant.query.all()
+
     return render_template("restaurants.html", restaurants=data)
 
 @app.route("/add-restaurant", methods=["GET", "POST"])
@@ -81,10 +89,7 @@ def edit_restaurant(id):
         flash("Restaurant updated successfully!", "warning")
         return redirect("/restaurants")
 
-    return render_template(
-        "edit_restaurant.html",
-        restaurant=restaurant
-    )
+    return render_template("edit_restaurant.html", restaurant=restaurant)
 
 @app.route("/restaurants/<int:id>/delete")
 def delete_restaurant(id):

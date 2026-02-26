@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, flash
 from flask_sqlalchemy import SQLAlchemy
 import os
 
@@ -6,6 +6,7 @@ import os
 # App Configuration
 # --------------------
 app = Flask(__name__)
+app.secret_key = "day8-secret-key"
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 app.config['SQLALCHEMY_DATABASE_URI'] = \
@@ -42,20 +43,14 @@ def about():
 def contact():
     return render_template("contact.html")
 
-# ---- Restaurants ----
+# --------------------
+# Restaurants
+# --------------------
 
 @app.route("/restaurants")
 def restaurants():
     data = Restaurant.query.all()
     return render_template("restaurants.html", restaurants=data)
-
-@app.route("/restaurants/<int:id>")
-def restaurant_detail(id):
-    restaurant = Restaurant.query.get_or_404(id)
-    return render_template(
-        "restaurant_detail.html",
-        restaurant=restaurant
-    )
 
 @app.route("/add-restaurant", methods=["GET", "POST"])
 def add_restaurant():
@@ -67,6 +62,8 @@ def add_restaurant():
         )
         db.session.add(new_restaurant)
         db.session.commit()
+
+        flash("Restaurant added successfully!", "success")
         return redirect("/restaurants")
 
     return render_template("add_restaurant.html")
@@ -80,7 +77,9 @@ def edit_restaurant(id):
         restaurant.location = request.form["location"]
         restaurant.description = request.form["description"]
         db.session.commit()
-        return redirect(f"/restaurants/{id}")
+
+        flash("Restaurant updated successfully!", "warning")
+        return redirect("/restaurants")
 
     return render_template(
         "edit_restaurant.html",
@@ -92,27 +91,8 @@ def delete_restaurant(id):
     restaurant = Restaurant.query.get_or_404(id)
     db.session.delete(restaurant)
     db.session.commit()
-    return redirect("/restaurants")
 
-@app.route("/edit-restaurant/<int:id>", methods=["GET", "POST"])
-def edit_restaurant(id):
-    restaurant = Restaurant.query.get_or_404(id)
-
-    if request.method == "POST":
-        restaurant.name = request.form["name"]
-        restaurant.location = request.form["location"]
-        restaurant.description = request.form["description"]
-
-        db.session.commit()
-        return redirect("/restaurants")
-
-    return render_template("edit_restaurant.html", restaurant=restaurant)
-
-@app.route("/delete-restaurant/<int:id>")
-def delete_restaurant(id):
-    restaurant = Restaurant.query.get_or_404(id)
-    db.session.delete(restaurant)
-    db.session.commit()
+    flash("Restaurant deleted successfully!", "danger")
     return redirect("/restaurants")
 
 # --------------------

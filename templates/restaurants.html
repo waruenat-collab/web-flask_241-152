@@ -1,11 +1,8 @@
-{% extends "base.html" %}
-
-{% block content %}
-<h2>Restaurants</h2>
-
 <ul>
 {% for r in restaurants %}
-    <li>{{ r.name }} - {{ r.location }}</li>
+    <li>
+        <b>{{ r.name }}</b> - {{ r.location }}<br>
+        <a href="/edit-restaurant/{{ r.id }}">Edit</a>
+    </li>
 {% endfor %}
 </ul>
-{% endblock %}

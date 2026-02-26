@@ -6,16 +6,13 @@
 
 <!-- 🔍 Search Box -->
 <form method="get" class="mb-4">
-    <div class="input-group">
-        <input
-            type="text"
-            name="q"
-            class="form-control"
-            placeholder="Search restaurant..."
-            value="{{ request.args.get('q', '') }}"
-        >
-        <button class="btn btn-outline-secondary">Search</button>
-    </div>
+    <input
+        type="text"
+        name="q"
+        placeholder="Search restaurant..."
+        value="{{ request.args.get('q', '') }}"
+    >
+    <button>Search</button>
 </form>
 
 <ul>
@@ -24,10 +21,14 @@
         <b>{{ r.name }}</b> - {{ r.location }}<br>
 
         <a href="/restaurants/{{ r.id }}/edit">Edit</a> |
-        <a href="/restaurants/{{ r.id }}/delete"
-           onclick="return confirm('Are you sure you want to delete this restaurant?');">
-           Delete
-        </a>
+
+        <!-- 🔒 Delete with POST -->
+        <form action="/restaurants/{{ r.id }}/delete"
+              method="post"
+              style="display:inline;"
+              onsubmit="return confirm('Are you sure you want to delete this restaurant?');">
+            <button type="submit">Delete</button>
+        </form>
     </li>
 {% endfor %}
 </ul>

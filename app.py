@@ -91,7 +91,8 @@ def edit_restaurant(id):
 
     return render_template("edit_restaurant.html", restaurant=restaurant)
 
-@app.route("/restaurants/<int:id>/delete")
+# 🔒 DELETE using POST (COMMIT 3)
+@app.route("/restaurants/<int:id>/delete", methods=["POST"])
 def delete_restaurant(id):
     restaurant = Restaurant.query.get_or_404(id)
     db.session.delete(restaurant)

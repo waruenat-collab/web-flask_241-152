@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Edit Restaurant</h2>
+
+<form method="POST">
+    <label>Name</label><br>
+    <input type="text" name="name" value="{{ restaurant.name }}" required><br><br>
+
+    <label>Location</label><br>
+    <input type="text" name="location" value="{{ restaurant.location }}" required><br><br>
+
+    <label>Description</label><br>
+    <textarea name="description" required>{{ restaurant.description }}</textarea><br><br>
+
+    <button type="submit">Update</button>
+</form>
+{% endblock %}

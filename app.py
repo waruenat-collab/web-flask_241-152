@@ -108,6 +108,13 @@ def edit_restaurant(id):
 
     return render_template("edit_restaurant.html", restaurant=restaurant)
 
+@app.route("/delete-restaurant/<int:id>")
+def delete_restaurant(id):
+    restaurant = Restaurant.query.get_or_404(id)
+    db.session.delete(restaurant)
+    db.session.commit()
+    return redirect("/restaurants")
+
 # --------------------
 # Run App
 # --------------------

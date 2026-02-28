@@ -3,6 +3,9 @@ from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
 
+# --------------------
+# App Config
+# --------------------
 app = Flask(__name__)
 app.secret_key = "day8-secret-key"
 
@@ -58,8 +61,16 @@ class Review(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     rating = db.Column(db.Integer, nullable=False)
 
-    restaurant_id = db.Column(db.Integer, db.ForeignKey("restaurant.id"), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    restaurant_id = db.Column(
+        db.Integer,
+        db.ForeignKey("restaurant.id"),
+        nullable=False
+    )
+    user_id = db.Column(
+        db.Integer,
+        db.ForeignKey("user.id"),
+        nullable=False
+    )
 
 # --------------------
 # Helper
@@ -77,6 +88,10 @@ def home():
     return render_template("home.html")
 
 
+# --------------------
+# Restaurants
+# --------------------
+
 @app.route("/restaurants")
 def restaurants():
     keyword = request.args.get("q")
@@ -86,6 +101,7 @@ def restaurants():
             Restaurant.name.contains(keyword)
         ).all()
     else:
+        # แสดงทุกร้าน + เรียงร้านที่มีรีวิวก่อน
         restaurants = (
             Restaurant.query
             .outerjoin(Review)
@@ -101,6 +117,27 @@ def restaurants():
 def restaurant_detail(id):
     restaurant = Restaurant.query.get_or_404(id)
     return render_template("restaurant_detail.html", restaurant=restaurant)
+
+
+@app.route("/add-restaurant", methods=["GET", "POST"])
+def add_restaurant():
+    if not login_required():
+        flash("Please login first", "warning")
+        return redirect("/login")
+
+    if request.method == "POST":
+        restaurant = Restaurant(
+            name=request.form["name"],
+            location=request.form["location"],
+            description=request.form["description"]
+        )
+        db.session.add(restaurant)
+        db.session.commit()
+
+        flash("Restaurant added successfully!", "success")
+        return redirect("/restaurants")
+
+    return render_template("add_restaurant.html")
 
 
 @app.route("/restaurants/<int:id>/review", methods=["POST"])
@@ -133,6 +170,34 @@ def add_review(id):
     return redirect(f"/restaurants/{id}")
 
 
+@app.route("/restaurants/<int:id>/delete", methods=["POST"])
+def delete_restaurant(id):
+    if not login_required():
+        flash("Please login first", "warning")
+        return redirect("/login")
+
+    restaurant = Restaurant.query.get_or_404(id)
+
+    user_review = Review.query.filter_by(
+        restaurant_id=id,
+        user_id=session["user_id"]
+    ).first()
+
+    if not user_review:
+        flash("You can delete only restaurants you reviewed", "danger")
+        return redirect("/restaurants")
+
+    db.session.delete(restaurant)
+    db.session.commit()
+
+    flash("Restaurant deleted", "danger")
+    return redirect("/restaurants")
+
+
+# --------------------
+# My Reviews
+# --------------------
+
 @app.route("/my-reviews")
 def my_reviews():
     if not login_required():
@@ -146,6 +211,10 @@ def my_reviews():
     return render_template("my_reviews.html", reviews=reviews)
 
 
+# --------------------
+# Auth
+# --------------------
+
 @app.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "POST":
@@ -158,10 +227,11 @@ def register():
 
         user = User(username=username)
         user.set_password(password)
+
         db.session.add(user)
         db.session.commit()
 
-        flash("Register success", "success")
+        flash("Register success! Please login.", "success")
         return redirect("/login")
 
     return render_template("register.html")
@@ -170,7 +240,9 @@ def register():
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
-        user = User.query.filter_by(username=request.form["username"]).first()
+        user = User.query.filter_by(
+            username=request.form["username"]
+        ).first()
 
         if user and user.check_password(request.form["password"]):
             session["user_id"] = user.id
@@ -189,6 +261,10 @@ def logout():
     flash("Logged out", "info")
     return redirect("/")
 
+
+# --------------------
+# Run App
+# --------------------
 
 if __name__ == "__main__":
     with app.app_context():

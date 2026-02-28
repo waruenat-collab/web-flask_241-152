@@ -1,37 +1,49 @@
 {% extends "base.html" %}
 {% block content %}
 
+<h2 class="mb-4">🍴 Restaurants</h2>
+
 <form method="get" class="mb-4">
-    <input type="text" name="q" placeholder="Search restaurant...">
-    <button>Search</button>
+    <div class="input-group">
+        <input type="text" name="q" class="form-control" placeholder="Search restaurant...">
+        <button class="btn btn-outline-secondary">Search</button>
+    </div>
 </form>
 
-<ul>
+<div class="row">
 {% for r in restaurants %}
-    <li>
-        <b>
-            <a href="/restaurants/{{ r.id }}">
-                {{ r.name }}
-            </a>
-        </b>
-        - {{ r.location }}
+    <div class="col-md-4 mb-4">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <a href="/restaurants/{{ r.id }}" class="text-decoration-none">
+                        {{ r.name }}
+                    </a>
+                </h5>
+                <p class="card-text text-muted">{{ r.location }}</p>
 
-        {% if r.avg_rating() %}
-            ⭐ {{ r.avg_rating() }}
-        {% endif %}
+                {% if r.avg_rating() %}
+                    <p>⭐ {{ r.avg_rating() }}</p>
+                {% else %}
+                    <p class="text-muted">No ratings yet</p>
+                {% endif %}
+            </div>
 
-        <br>
-        <a href="/restaurants/{{ r.id }}/edit">Edit</a>
+            <div class="card-footer bg-white">
+                <a href="/restaurants/{{ r.id }}/edit" class="btn btn-sm btn-warning">Edit</a>
 
-        <form method="post"
-              action="/restaurants/{{ r.id }}/delete"
-              style="display:inline">
-            <button onclick="return confirm('Delete this restaurant?')">
-                Delete
-            </button>
-        </form>
-    </li>
+                <form method="post"
+                      action="/restaurants/{{ r.id }}/delete"
+                      class="d-inline">
+                    <button class="btn btn-sm btn-danger"
+                            onclick="return confirm('Delete this restaurant?')">
+                        Delete
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
 {% endfor %}
-</ul>
+</div>
 
 {% endblock %}

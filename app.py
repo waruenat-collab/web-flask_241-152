@@ -10,15 +10,12 @@ app = Flask(__name__)
 app.secret_key = "day8-secret-key"
 
 basedir = os.path.abspath(os.path.dirname(__file__))
-app.config['SQLALCHEMY_DATABASE_URI'] = \
-    'sqlite:///' + os.path.join(basedir, 'food.db')
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config["SQLALCHEMY_DATABASE_URI"] = \
+    "sqlite:///" + os.path.join(basedir, "food.db")
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
 
-# --------------------
-# Database Model
-# --------------------
 # --------------------
 # Database Models
 # --------------------
@@ -34,7 +31,11 @@ class Restaurant(db.Model):
     def avg_rating(self):
         if not self.reviews:
             return None
-        return round(sum(r.rating for r in self.reviews) / len(self.reviews), 1)
+        return round(
+            sum(r.rating for r in self.reviews) / len(self.reviews), 1
+        )
+
+
 class Review(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     rating = db.Column(db.Integer, nullable=False)
@@ -43,6 +44,7 @@ class Review(db.Model):
         db.ForeignKey("restaurant.id"),
         nullable=False
     )
+
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -55,6 +57,14 @@ class User(db.Model):
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
+
+# --------------------
+# Auth Helper (COMMIT 4)
+# --------------------
+def login_required():
+    return "user_id" in session
+
+
 # --------------------
 # Routes
 # --------------------
@@ -63,13 +73,16 @@ class User(db.Model):
 def home():
     return render_template("home.html")
 
+
 @app.route("/about")
 def about():
     return render_template("about.html")
 
+
 @app.route("/contact")
 def contact():
     return render_template("contact.html")
+
 
 # --------------------
 # Restaurants
@@ -88,8 +101,22 @@ def restaurants():
 
     return render_template("restaurants.html", restaurants=data)
 
+
+@app.route("/restaurants/<int:id>")
+def restaurant_detail(id):
+    restaurant = Restaurant.query.get_or_404(id)
+    return render_template(
+        "restaurant_detail.html",
+        restaurant=restaurant
+    )
+
+
 @app.route("/add-restaurant", methods=["GET", "POST"])
 def add_restaurant():
+    if not login_required():
+        flash("Please login first", "warning")
+        return redirect("/login")
+
     if request.method == "POST":
         new_restaurant = Restaurant(
             name=request.form["name"],
@@ -104,8 +131,13 @@ def add_restaurant():
 
     return render_template("add_restaurant.html")
 
+
 @app.route("/restaurants/<int:id>/edit", methods=["GET", "POST"])
 def edit_restaurant(id):
+    if not login_required():
+        flash("Please login first", "warning")
+        return redirect("/login")
+
     restaurant = Restaurant.query.get_or_404(id)
 
     if request.method == "POST":
@@ -117,15 +149,25 @@ def edit_restaurant(id):
         flash("Restaurant updated successfully!", "warning")
         return redirect("/restaurants")
 
-    return render_template("edit_restaurant.html", restaurant=restaurant)
-
-@app.route("/restaurants/<int:id>")
-def restaurant_detail(id):
-    restaurant = Restaurant.query.get_or_404(id)
     return render_template(
-        "restaurant_detail.html",
+        "edit_restaurant.html",
         restaurant=restaurant
     )
+
+
+@app.route("/restaurants/<int:id>/delete", methods=["POST"])
+def delete_restaurant(id):
+    if not login_required():
+        flash("Please login first", "warning")
+        return redirect("/login")
+
+    restaurant = Restaurant.query.get_or_404(id)
+    db.session.delete(restaurant)
+    db.session.commit()
+
+    flash("Restaurant deleted successfully!", "danger")
+    return redirect("/restaurants")
+
 
 @app.route("/restaurants/<int:id>/review", methods=["POST"])
 def add_review(id):
@@ -143,15 +185,10 @@ def add_review(id):
     flash("Rating added successfully!", "success")
     return redirect(f"/restaurants/{id}")
 
-# 🔒 DELETE using POST (COMMIT 3)
-@app.route("/restaurants/<int:id>/delete", methods=["POST"])
-def delete_restaurant(id):
-    restaurant = Restaurant.query.get_or_404(id)
-    db.session.delete(restaurant)
-    db.session.commit()
 
-    flash("Restaurant deleted successfully!", "danger")
-    return redirect("/restaurants")
+# --------------------
+# Auth
+# --------------------
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
@@ -173,6 +210,7 @@ def register():
         return redirect("/login")
 
     return render_template("register.html")
+
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -198,6 +236,7 @@ def logout():
     session.clear()
     flash("Logged out", "info")
     return redirect("/")
+
 
 # --------------------
 # Run App

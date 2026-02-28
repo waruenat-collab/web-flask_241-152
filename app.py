@@ -171,7 +171,7 @@ def add_review(id):
     return redirect(f"/restaurants/{id}")
 
 
-# ✅ ลบร้านได้เฉพาะคนที่เคยรีวิวร้านนั้น
+# ลบร้านได้เฉพาะคนที่เคยรีวิวร้านนั้น
 @app.route("/restaurants/<int:id>/delete", methods=["POST"])
 def delete_restaurant(id):
     if not login_required():
@@ -195,31 +195,79 @@ def delete_restaurant(id):
     flash("Restaurant deleted successfully", "success")
     return redirect("/restaurants")
 
+# -------------------- Profile (Badge / Level User) --------------------
+
 @app.route("/profile")
 def profile():
     if "user_id" not in session:
         return redirect("/login")
 
-    user = User.query.get(session["user_id"])
+    user = User.query.get_or_404(session["user_id"])
 
-    review_count = Review.query.filter_by(
-        user_id=user.id
-    ).count()
+    reviews = Review.query.filter_by(user_id=user.id).all()
+    review_count = len(reviews)
 
-    avg_rating = db.session.query(
-        func.avg(Review.rating)
-    ).filter(
-        Review.user_id == user.id
-    ).scalar()
+    avg_rating = (
+        db.session.query(func.avg(Review.rating))
+        .filter(Review.user_id == user.id)
+        .scalar()
+    )
 
     if avg_rating:
         avg_rating = round(avg_rating, 1)
 
+    # 🏅 Badge Logic
+    if review_count >= 7:
+        badge = "🏆 Master Reviewer"
+    elif review_count >= 4:
+        badge = "⭐ Critic"
+    elif review_count >= 1:
+        badge = "🍔 Food Lover"
+    else:
+        badge = "🥚 Newbie"
+
     return render_template(
         "profile.html",
-        username=user.username,
+        user=user,
         review_count=review_count,
-        avg_rating=avg_rating
+        avg_rating=avg_rating,
+        badge=badge
+    )
+
+# -------------------- Top / Recent --------------------
+
+@app.route("/top-restaurants")
+def top_restaurants():
+    restaurants = (
+        db.session.query(
+            Restaurant,
+            func.avg(Review.rating).label("avg_rating")
+        )
+        .join(Review)
+        .group_by(Restaurant.id)
+        .order_by(func.avg(Review.rating).desc())
+        .limit(5)
+        .all()
+    )
+
+    return render_template(
+        "top_restaurants.html",
+        restaurants=restaurants
+    )
+
+
+@app.route("/recent-reviews")
+def recent_reviews():
+    reviews = (
+        Review.query
+        .order_by(Review.id.desc())
+        .limit(10)
+        .all()
+    )
+
+    return render_template(
+        "recent_reviews.html",
+        reviews=reviews
     )
 
 # -------------------- My Reviews --------------------

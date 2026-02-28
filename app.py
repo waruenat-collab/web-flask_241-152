@@ -78,7 +78,19 @@ def restaurants():
 @app.route("/restaurants/<int:id>")
 def restaurant_detail(id):
     restaurant = Restaurant.query.get_or_404(id)
-    return render_template("restaurant_detail.html", restaurant=restaurant)
+
+    user_review = None
+    if "user_id" in session:
+        user_review = Review.query.filter_by(
+            restaurant_id=id,
+            user_id=session["user_id"]
+        ).first()
+
+    return render_template(
+        "restaurant_detail.html",
+        restaurant=restaurant,
+        user_review=user_review
+    )
 
 @app.route("/add-restaurant", methods=["GET", "POST"])
 def add_restaurant():

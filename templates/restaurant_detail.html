@@ -3,84 +3,74 @@
 
 {% block content %}
 
+<!-- ===================== -->
 <!-- Restaurant Info -->
+<!-- ===================== -->
 <div class="card shadow-sm mb-4">
   <div class="card-body">
     <h2>{{ restaurant.name }}</h2>
-    <p class="text-muted">{{ restaurant.location }}</p>
+    <p class="text-muted mb-1">{{ restaurant.location }}</p>
     <p>{{ restaurant.description }}</p>
 
     {% if restaurant.avg_rating() %}
       <span class="badge bg-success fs-6">
-        ⭐ {{ restaurant.avg_rating() }} / 5
+        ⭐ {{ restaurant.avg_rating() }}
       </span>
     {% else %}
-      <span class="badge bg-secondary">No ratings yet</span>
+      <span class="badge bg-secondary fs-6">
+        No ratings yet
+      </span>
     {% endif %}
   </div>
 </div>
 
-<!-- Reviews -->
-<div class="card shadow-sm mb-4">
+<!-- ===================== -->
+<!-- Add / Update Review -->
+<!-- ===================== -->
+<div class="card shadow-sm">
   <div class="card-body">
-    <h4 class="mb-3">⭐ Reviews</h4>
 
-    {% if restaurant.reviews %}
-      {% for r in restaurant.reviews %}
-        <div class="border rounded p-2 mb-2">
-          <span class="badge bg-warning text-dark">
-            ⭐ {{ r.rating }}
-          </span>
-          <small class="text-muted ms-2">
-            by {{ r.user.username }}
-          </small>
+    {% if session.get("user_id") %}
+      <h5 class="mb-3">
+        {% if user_review %}
+          ✏️ Update Your Review
+        {% else %}
+          ⭐ Add Your Review
+        {% endif %}
+      </h5>
+
+      <form method="post" action="/restaurants/{{ restaurant.id }}/review">
+        <div class="mb-3">
+          <label class="form-label">Rating</label>
+          <select name="rating" class="form-select w-25" required>
+            {% for i in range(1, 6) %}
+              <option value="{{ i }}"
+                {% if user_review and user_review.rating == i %}
+                  selected
+                {% endif %}
+              >
+                {{ i }} ⭐
+              </option>
+            {% endfor %}
+          </select>
         </div>
-      {% endfor %}
-    {% else %}
-      <p class="text-muted">No reviews yet</p>
-    {% endif %}
-  </div>
-</div>
 
-<!-- Add Review -->
-{% if session.get("user_id") %}
-<div class="card shadow-sm mb-4">
-  <div class="card-body">
-    <h4 class="mb-3">Add Your Rating</h4>
-
-    <form method="post" action="/restaurants/{{ restaurant.id }}/review">
-      <div class="mb-3 w-25">
-        <select name="rating" class="form-select">
-          {% for i in range(1, 6) %}
-            <option value="{{ i }}">{{ i }} ⭐</option>
-          {% endfor %}
-        </select>
-      </div>
-
-      <button class="btn btn-primary">Submit</button>
-    </form>
-  </div>
-</div>
-{% else %}
-<p class="text-muted">
-  <a href="/login">Login</a> to add rating
-</p>
-{% endif %}
-
-<!-- Delete Restaurant -->
-{% if session.get("user_id") %}
-  {% for r in restaurant.reviews %}
-    {% if r.user_id == session.get("user_id") %}
-      <form method="post"
-            action="/restaurants/{{ restaurant.id }}/delete"
-            onsubmit="return confirm('Delete this restaurant?')">
-        <button class="btn btn-danger">
-          🗑️ Delete Restaurant
+        <button type="submit" class="btn btn-primary">
+          {% if user_review %}
+            Update Review
+          {% else %}
+            Submit Review
+          {% endif %}
         </button>
       </form>
-      {% break %}
+
+    {% else %}
+      <p class="text-muted">
+        🔒 Please <a href="/login">login</a> to review this restaurant.
+      </p>
     {% endif %}
-  {% endfor %}
-{% endif %}
+
+  </div>
+</div>
 
 {% endblock %}

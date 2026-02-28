@@ -18,14 +18,32 @@ db = SQLAlchemy(app)
 # --------------------
 # Database Model
 # --------------------
+# --------------------
+# Database Models
+# --------------------
+
 class Restaurant(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     location = db.Column(db.String(200))
     description = db.Column(db.Text)
 
-    def __repr__(self):
-        return f'<Restaurant {self.name}>'
+    reviews = db.relationship("Review", backref="restaurant", lazy=True)
+
+    def avg_rating(self):
+        if not self.reviews:
+            return None
+        return round(sum(r.rating for r in self.reviews) / len(self.reviews), 1)
+
+
+class Review(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    rating = db.Column(db.Integer, nullable=False)
+    restaurant_id = db.Column(
+        db.Integer,
+        db.ForeignKey("restaurant.id"),
+        nullable=False
+    )
 
 # --------------------
 # Routes

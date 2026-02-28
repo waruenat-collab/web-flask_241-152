@@ -1,10 +1,80 @@
 {% extends "base.html" %}
+{% block title %}Add Restaurant{% endblock %}
+
 {% block content %}
-<h2>Add Restaurant</h2>
-<form method="post">
-    <input name="name" placeholder="Name" required><br>
-    <input name="location" placeholder="Location"><br>
-    <textarea name="description"></textarea><br>
-    <button type="submit">Save</button>
-</form>
+<div class="row justify-content-center">
+  <div class="col-md-8 col-lg-6">
+
+    <!-- Card -->
+    <div class="card shadow-lg border-0 mt-4">
+      <div class="card-body p-4">
+
+        <!-- Header -->
+        <div class="text-center mb-4">
+          <h3 class="fw-bold">🍽️ Add New Restaurant</h3>
+          <p class="text-muted">
+            Share a new restaurant with the community
+          </p>
+        </div>
+
+        <!-- Form -->
+        <form method="post">
+
+          <!-- Restaurant Name -->
+          <div class="mb-3">
+            <label class="form-label fw-semibold">
+              Restaurant Name
+            </label>
+            <input
+              type="text"
+              name="name"
+              class="form-control"
+              placeholder=" "
+              required
+            >
+          </div>
+
+          <!-- Location -->
+          <div class="mb-3">
+            <label class="form-label fw-semibold">
+              Location
+            </label>
+            <input
+              type="text"
+              name="location"
+              class="form-control"
+              placeholder=" "
+            >
+          </div>
+
+          <!-- Description -->
+          <div class="mb-4">
+            <label class="form-label fw-semibold">
+              Description
+            </label>
+            <textarea
+              name="description"
+              class="form-control"
+              rows="4"
+              placeholder=" "
+            ></textarea>
+          </div>
+
+          <!-- Buttons -->
+          <div class="d-flex justify-content-between">
+            <a href="/restaurants" class="btn btn-outline-secondary">
+              ← Back
+            </a>
+
+            <button type="submit" class="btn btn-primary px-4">
+              ➕ Add Restaurant
+            </button>
+          </div>
+
+        </form>
+      </div>
+    </div>
+
+  </div>
+</div>
 {% endblock %}

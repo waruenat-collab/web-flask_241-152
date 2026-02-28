@@ -4,27 +4,40 @@
 
     <div class="collapse navbar-collapse">
       <ul class="navbar-nav ms-auto">
+
         <li class="nav-item">
           <a class="nav-link" href="/restaurants">Restaurants</a>
         </li>
 
         {% if session.get("user_id") %}
+
           <li class="nav-item">
             <a class="nav-link" href="/add-restaurant">➕ Add</a>
           </li>
+
+          <!-- ⭐ My Reviews (เพิ่มตรงนี้) -->
+          <li class="nav-item">
+            <a class="nav-link" href="/my-reviews">⭐ My Reviews</a>
+          </li>
+
           <li class="nav-item">
             <a class="nav-link" href="/logout">
               Logout ({{ session.get("username") }})
             </a>
           </li>
+
         {% else %}
+
           <li class="nav-item">
             <a class="nav-link" href="/login">Login</a>
           </li>
+
           <li class="nav-item">
             <a class="nav-link" href="/register">Register</a>
           </li>
+
         {% endif %}
+
       </ul>
     </div>
   </div>

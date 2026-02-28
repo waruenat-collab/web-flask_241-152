@@ -211,7 +211,21 @@ def register():
 
     return render_template("register.html")
 
+@app.route("/my-reviews")
+def my_reviews():
+    if not login_required():
+        flash("Please login first", "warning")
+        return redirect("/login")
 
+    reviews = Review.query.join(Restaurant).filter(
+        Review.restaurant_id == Restaurant.id
+    ).all()
+
+    return render_template(
+        "my_reviews.html",
+        reviews=reviews
+    )
+    
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":

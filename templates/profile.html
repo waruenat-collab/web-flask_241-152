@@ -6,53 +6,56 @@
 <div class="row justify-content-center">
   <div class="col-md-8">
 
-    <!-- Profile Card -->
-    <div class="card shadow-sm mb-4">
-      <div class="card-body text-center">
+    <div class="card shadow-lg border-0">
+      <div class="card-body p-5">
 
         <!-- Avatar -->
-        <div class="mb-3">
-          <span class="display-1">👤</span>
+        <div class="text-center mb-4">
+          <div class="rounded-circle bg-light d-inline-flex
+                      align-items-center justify-content-center"
+               style="width:120px; height:120px; font-size:64px;">
+            👤
+          </div>
+
+          <h3 class="mt-3 mb-0">{{ username }}</h3>
+          <small class="text-muted">Food Review Member</small>
         </div>
 
-        <h3 class="mb-1">{{ username }}</h3>
-        <p class="text-muted">Food Review Member</p>
-
-        <hr>
+        <hr class="my-4">
 
         <!-- Stats -->
         <div class="row text-center">
           <div class="col-md-4">
-            <h4 class="mb-0">{{ review_count }}</h4>
-            <small class="text-muted">Reviews</small>
+            <h2 class="fw-bold">{{ review_count }}</h2>
+            <p class="text-muted mb-0">Reviews</p>
           </div>
 
           <div class="col-md-4">
-            <h4 class="mb-0">
+            <h2 class="fw-bold">
               {% if avg_rating %}
                 ⭐ {{ avg_rating }}
               {% else %}
                 -
               {% endif %}
-            </h4>
-            <small class="text-muted">Avg Rating</small>
+            </h2>
+            <p class="text-muted mb-0">Avg Rating</p>
           </div>
 
           <div class="col-md-4">
-            <h4 class="mb-0">🍽️</h4>
-            <small class="text-muted">Food Lover</small>
+            <h2 class="fw-bold">🍽️</h2>
+            <p class="text-muted mb-0">Food Lover</p>
           </div>
         </div>
 
-        <hr>
+        <hr class="my-4">
 
         <!-- Actions -->
-        <div class="d-flex justify-content-center gap-2">
-          <a href="/my-reviews" class="btn btn-outline-primary">
+        <div class="d-flex justify-content-center gap-3">
+          <a href="/my-reviews" class="btn btn-primary px-4">
             ⭐ My Reviews
           </a>
 
-          <a href="/restaurants" class="btn btn-outline-secondary">
+          <a href="/restaurants" class="btn btn-outline-secondary px-4">
             🍴 Browse Restaurants
           </a>
         </div>

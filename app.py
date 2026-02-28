@@ -117,6 +117,22 @@ def restaurant_detail(id):
         restaurant=restaurant
     )
 
+@app.route("/restaurants/<int:id>/review", methods=["POST"])
+def add_review(id):
+    restaurant = Restaurant.query.get_or_404(id)
+
+    rating = int(request.form["rating"])
+    review = Review(
+        rating=rating,
+        restaurant=restaurant
+    )
+
+    db.session.add(review)
+    db.session.commit()
+
+    flash("Rating added successfully!", "success")
+    return redirect(f"/restaurants/{id}")
+
 # 🔒 DELETE using POST (COMMIT 3)
 @app.route("/restaurants/<int:id>/delete", methods=["POST"])
 def delete_restaurant(id):

@@ -3,13 +3,21 @@
 
 <h2 class="mb-4">🍴 Restaurants</h2>
 
+<!-- 🔍 Search -->
 <form method="get" class="mb-4">
     <div class="input-group">
-        <input type="text" name="q" class="form-control" placeholder="Search restaurant...">
+        <input
+            type="text"
+            name="q"
+            class="form-control"
+            placeholder="Search restaurant..."
+            value="{{ request.args.get('q','') }}"
+        >
         <button class="btn btn-outline-secondary">Search</button>
     </div>
 </form>
 
+{% if restaurants %}
 <div class="row">
 {% for r in restaurants %}
     <div class="col-md-4 mb-4">
@@ -20,30 +28,45 @@
                         {{ r.name }}
                     </a>
                 </h5>
-                <p class="card-text text-muted">{{ r.location }}</p>
+
+                <p class="card-text text-muted">
+                    {{ r.location }}
+                </p>
 
                 {% if r.avg_rating() %}
-                    <p>⭐ {{ r.avg_rating() }}</p>
+                    <span class="badge bg-success">
+                        ⭐ {{ r.avg_rating() }}
+                    </span>
                 {% else %}
-                    <p class="text-muted">No ratings yet</p>
+                    <span class="badge bg-secondary">
+                        No ratings
+                    </span>
                 {% endif %}
             </div>
 
-            <div class="card-footer bg-white">
-                <a href="/restaurants/{{ r.id }}/edit" class="btn btn-sm btn-warning">Edit</a>
+            {% if session.get("user_id") %}
+            <div class="card-footer bg-white text-end">
+                <a href="/restaurants/{{ r.id }}/edit"
+                   class="btn btn-sm btn-warning">
+                    Edit
+                </a>
 
                 <form method="post"
                       action="/restaurants/{{ r.id }}/delete"
-                      class="d-inline">
-                    <button class="btn btn-sm btn-danger"
-                            onclick="return confirm('Delete this restaurant?')">
+                      class="d-inline"
+                      onsubmit="return confirm('Delete this restaurant?')">
+                    <button class="btn btn-sm btn-danger">
                         Delete
                     </button>
                 </form>
             </div>
+            {% endif %}
         </div>
     </div>
 {% endfor %}
 </div>
+{% else %}
+<p class="text-muted">No restaurants found.</p>
+{% endif %}
 
 {% endblock %}

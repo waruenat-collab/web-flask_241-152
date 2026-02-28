@@ -1,47 +1,72 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
   <div class="container">
-    <a class="navbar-brand fw-bold" href="/">🍽️ Food Review</a>
 
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-            data-bs-target="#navbarNav">
+    <!-- Brand -->
+    <a class="navbar-brand fw-bold" href="/">
+      🍽️ Food Review
+    </a>
+
+    <!-- Toggle -->
+    <button
+      class="navbar-toggler"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#navbarNav"
+    >
       <span class="navbar-toggler-icon"></span>
     </button>
 
+    <!-- Menu -->
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav ms-auto align-items-lg-center">
 
+        <!-- Restaurants -->
         <li class="nav-item">
-          <a class="nav-link" href="/restaurants">Restaurants</a>
+          <a class="nav-link" href="/restaurants">🍴 Restaurants</a>
+        </li>
+
+        <!-- Top Restaurants -->
+        <li class="nav-item">
+          <a class="nav-link" href="/top-restaurants">🏆 Top</a>
+        </li>
+
+        <!-- Recent Reviews -->
+        <li class="nav-item">
+          <a class="nav-link" href="/recent-reviews">🕒 Recent</a>
         </li>
 
         {% if session.get("user_id") %}
 
+          <!-- Add Restaurant -->
           <li class="nav-item">
             <a class="nav-link" href="/add-restaurant">➕ Add</a>
           </li>
 
+          <!-- My Reviews -->
           <li class="nav-item">
             <a class="nav-link" href="/my-reviews">⭐ My Reviews</a>
           </li>
 
-          <!-- ✅ Profile (เพิ่มตามโจทย์อาจารย์) -->
+          <!-- Profile -->
           <li class="nav-item">
             <a class="nav-link" href="/profile">👤 Profile</a>
           </li>
 
-          <li class="nav-item ms-lg-2">
-            <a class="btn btn-outline-light btn-sm"
-               href="/logout">
+          <!-- Logout -->
+          <li class="nav-item">
+            <a class="nav-link text-warning" href="/logout">
               Logout ({{ session.get("username") }})
             </a>
           </li>
 
         {% else %}
 
+          <!-- Login -->
           <li class="nav-item">
             <a class="nav-link" href="/login">Login</a>
           </li>
 
+          <!-- Register -->
           <li class="nav-item">
             <a class="nav-link" href="/register">Register</a>
           </li>

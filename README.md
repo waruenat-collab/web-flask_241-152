@@ -95,13 +95,183 @@ Logout | `/logout`
 
 ---
 
+## 🧠 Code Explanation (อธิบายโค้ด)
+
+📁 โครงสร้างโปรเจกต์
+web-flask_241-152/
+│
+├── app.py                  # ไฟล์หลักของ Flask
+├── food.db                 # ฐานข้อมูล SQLite
+├── README.md               # เอกสารอธิบายโปรเจกต์
+├── requirements.txt        # รายการ library ที่ใช้
+│
+├── templates/              # HTML Templates (Jinja2)
+│   ├── base.html
+│   ├── navbar.html
+│   ├── home.html
+│   ├── restaurants.html
+│   ├── restaurant_detail.html
+│   ├── add_restaurant.html
+│   ├── my_reviews.html
+│   ├── profile.html
+│   ├── top_restaurants.html
+│   ├── recent_reviews.html
+│   ├── login.html
+│   └── register.html
+│
+└── venv/                   # Virtual Environment
+⚙️ app.py (ไฟล์หลักของระบบ)
+1️⃣ App Configuration
+app = Flask(__name__)
+app.secret_key = "day8-secret-key"
+
+สร้าง Flask application
+
+ใช้ secret_key สำหรับ session (login)
+
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///food.db"
+
+ใช้ SQLite เป็นฐานข้อมูล
+
+เหมาะกับโปรเจกต์ขนาดเล็ก–กลาง และการเรียนรู้
+
+2️⃣ Database Models (Models)
+🏪 Restaurant
+class Restaurant(db.Model):
+
+เก็บข้อมูลร้านอาหาร
+
+name : ชื่อร้าน
+
+location : ที่ตั้ง
+
+description : รายละเอียดร้าน
+
+เชื่อมกับ Review แบบ One-to-Many
+
+มี method:
+
+def avg_rating(self)
+
+ใช้คำนวณคะแนนเฉลี่ยของร้าน
+
+👤 User
+class User(db.Model):
+
+เก็บข้อมูลผู้ใช้
+
+username
+
+password_hash (เข้ารหัสด้วย werkzeug)
+
+เชื่อมกับ Review
+
+มี method:
+
+set_password() → เข้ารหัสรหัสผ่าน
+
+check_password() → ตรวจสอบรหัสผ่าน
+
+⭐ Review
+class Review(db.Model):
+
+เก็บข้อมูลรีวิว
+
+rating : คะแนน (1–5)
+
+restaurant_id
+
+user_id
+
+ใช้เชื่อมความสัมพันธ์ระหว่าง User และ Restaurant
+
+3️⃣ Authentication System (ระบบ Login/Register)
+
+/register → สมัครสมาชิก
+
+/login → เข้าสู่ระบบ
+
+/logout → ออกจากระบบ
+
+ใช้ session เก็บ user_id และ username
+
+session["user_id"]
+
+ใช้ตรวจสอบสถานะ login
+
+4️⃣ Restaurant System
+📄 /restaurants
+
+แสดงร้านทั้งหมด
+
+รองรับการค้นหา
+
+เรียงร้านที่มีรีวิวมากก่อน
+
+📄 /restaurants/<id>
+
+แสดงรายละเอียดร้าน
+
+แสดงคะแนนเฉลี่ย
+
+ผู้ใช้สามารถเพิ่ม / แก้ไขรีวิวของตนเอง
+
+➕ /add-restaurant
+
+เพิ่มร้านอาหาร (เฉพาะผู้ที่ login)
+
+❌ /restaurants/<id>/delete
+
+ลบร้านได้เฉพาะผู้ที่เคยรีวิวร้านนั้น
+
+5️⃣ Review System
+
+ผู้ใช้ 1 คน รีวิวร้านเดิมได้ 1 ครั้ง
+
+หากรีวิวซ้ำ จะเป็นการอัปเดตคะแนน
+
+หน้า /my-reviews แสดงรีวิวของผู้ใช้คนนั้นเท่านั้น
+
+6️⃣ Profile Page + Badge System
+
+หน้า /profile แสดง:
+
+Username
+
+จำนวนรีวิว
+
+คะแนนเฉลี่ย
+
+Badge / Level ของผู้ใช้
+
+🎖️ ระบบ Badge:
+
+จำนวนรีวิว	Badge
+0	🥚 Newbie
+1–3	🍔 Food Lover
+4–6	⭐ Critic
+7+	🏆 Master Reviewer
+
+ไม่ต้องเพิ่ม table ใหม่
+คำนวณจากจำนวน Review ที่มีอยู่
+
+7️⃣ Extra Pages (เพิ่มความสมบูรณ์)
+
+/top-restaurants → ร้านที่คะแนนเฉลี่ยสูงสุด
+
+/recent-reviews → รีวิวล่าสุด
+
+Navbar เปลี่ยนเมนูตามสถานะ login
+
+---
+
 ## ▶️ How to Run the Project (วิธีรันโปรเจกต์)
 
 ---
 
 1️⃣ Clone Repository
 ```bash
-git clone <https://github.com/waruenat-collab/web-flask_241-152>
+git clone https://github.com/waruenat-collab/web-flask_241-152.git
 cd web-flask_241-152
 
 2️⃣ สร้าง Virtual Environment

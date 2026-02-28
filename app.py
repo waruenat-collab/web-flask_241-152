@@ -212,27 +212,30 @@ def add_review(id):
         return redirect("/login")
 
     restaurant = Restaurant.query.get_or_404(id)
+    user_id = session["user_id"]
+    rating = int(request.form["rating"])
 
-    # 🚫 ป้องกันรีวิวซ้ำ
-    existing = Review.query.filter_by(
+    # 🔍 เช็กว่าผู้ใช้เคยรีวิวร้านนี้หรือยัง
+    review = Review.query.filter_by(
         restaurant_id=id,
-        user_id=session["user_id"]
+        user_id=user_id
     ).first()
 
-    if existing:
-        flash("You already reviewed this restaurant", "warning")
-        return redirect(f"/restaurants/{id}")
+    if review:
+        # 🔄 อัปเดตคะแนน
+        review.rating = rating
+        flash("Review updated successfully!", "success")
+    else:
+        # ➕ สร้างรีวิวใหม่
+        review = Review(
+            rating=rating,
+            restaurant_id=id,
+            user_id=user_id
+        )
+        db.session.add(review)
+        flash("Review added successfully!", "success")
 
-    review = Review(
-        rating=int(request.form["rating"]),
-        restaurant=restaurant,
-        user_id=session["user_id"]
-    )
-
-    db.session.add(review)
     db.session.commit()
-
-    flash("Rating added successfully!", "success")
     return redirect(f"/restaurants/{id}")
 
 # --------------------

@@ -1,9 +1,14 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
   <div class="container">
-    <a class="navbar-brand" href="/">🍽️ Food Review</a>
+    <a class="navbar-brand fw-bold" href="/">🍽️ Food Review</a>
 
-    <div class="collapse navbar-collapse">
-      <ul class="navbar-nav ms-auto">
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+            data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto align-items-lg-center">
 
         <li class="nav-item">
           <a class="nav-link" href="/restaurants">Restaurants</a>
@@ -15,13 +20,18 @@
             <a class="nav-link" href="/add-restaurant">➕ Add</a>
           </li>
 
-          <!-- ⭐ My Reviews (เพิ่มตรงนี้) -->
           <li class="nav-item">
             <a class="nav-link" href="/my-reviews">⭐ My Reviews</a>
           </li>
 
+          <!-- ✅ Profile (เพิ่มตามโจทย์อาจารย์) -->
           <li class="nav-item">
-            <a class="nav-link" href="/logout">
+            <a class="nav-link" href="/profile">👤 Profile</a>
+          </li>
+
+          <li class="nav-item ms-lg-2">
+            <a class="btn btn-outline-light btn-sm"
+               href="/logout">
               Logout ({{ session.get("username") }})
             </a>
           </li>

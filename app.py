@@ -195,6 +195,35 @@ def delete_restaurant(id):
     flash("Restaurant deleted successfully", "success")
     return redirect("/restaurants")
 
+@app.route("/profile")
+def profile():
+    if not login_required():
+        return redirect("/login")
+
+    user_id = session["user_id"]
+
+    # ดึง user
+    user = User.query.get(user_id)
+
+    # รีวิวทั้งหมดของ user
+    reviews = Review.query.filter_by(user_id=user_id).all()
+    review_count = len(reviews)
+
+    # คำนวณคะแนนเฉลี่ยที่ user เคยให้
+    avg_rating = None
+    if review_count > 0:
+        avg_rating = round(
+            sum(r.rating for r in reviews) / review_count,
+            1
+        )
+
+    return render_template(
+        "profile.html",
+        user=user,
+        review_count=review_count,
+        avg_rating=avg_rating
+    )
+
 # -------------------- My Reviews --------------------
 
 @app.route("/my-reviews")

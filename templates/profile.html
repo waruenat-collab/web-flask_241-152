@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}My Profile{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-6">
+
+    <div class="card shadow-sm">
+      <div class="card-body text-center">
+
+        <div class="mb-3">
+          <span class="fs-1">👤</span>
+        </div>
+
+        <h3 class="mb-1">{{ user.username }}</h3>
+        <p class="text-muted">Account Overview</p>
+
+        <hr>
+
+        <div class="row text-center mb-3">
+          <div class="col">
+            <h5>{{ review_count }}</h5>
+            <small class="text-muted">Reviews</small>
+          </div>
+
+          <div class="col">
+            {% if avg_rating %}
+              <h5>⭐ {{ avg_rating }}</h5>
+            {% else %}
+              <h5>-</h5>
+            {% endif %}
+            <small class="text-muted">Avg Rating</small>
+          </div>
+        </div>
+
+        <a href="/my-reviews" class="btn btn-outline-primary w-100">
+          📄 View My Reviews
+        </a>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

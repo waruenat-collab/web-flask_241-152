@@ -45,6 +45,14 @@
             </div>
 
             {% if session.get("user_id") %}
+            {% set can_delete = false %}
+            {% for review in r.reviews %}
+                {% if review.user_id == session.get("user_id") %}
+                    {% set can_delete = true %}
+                {% endif %}
+            {% endfor %}
+
+            {% if can_delete %}
             <div class="card-footer bg-white text-end">
                 <a href="/restaurants/{{ r.id }}/edit"
                    class="btn btn-sm btn-warning">
@@ -60,6 +68,7 @@
                     </button>
                 </form>
             </div>
+            {% endif %}
             {% endif %}
         </div>
     </div>

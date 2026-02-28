@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, flash, session
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
+from sqlalchemy import func
 import os
 
 # --------------------
@@ -87,7 +88,6 @@ def login_required():
 def home():
     return render_template("home.html")
 
-
 # --------------------
 # Restaurants
 # --------------------
@@ -101,12 +101,11 @@ def restaurants():
             Restaurant.name.contains(keyword)
         ).all()
     else:
-        # แสดงทุกร้าน + เรียงร้านที่มีรีวิวก่อน
         restaurants = (
             Restaurant.query
             .outerjoin(Review)
             .group_by(Restaurant.id)
-            .order_by(db.func.count(Review.id).desc())
+            .order_by(func.count(Review.id).desc())
             .all()
         )
 
@@ -156,7 +155,7 @@ def add_review(id):
 
     if review:
         review.rating = rating
-        flash("Review updated", "success")
+        flash("Review updated successfully", "success")
     else:
         review = Review(
             rating=rating,
@@ -164,7 +163,7 @@ def add_review(id):
             user_id=user_id
         )
         db.session.add(review)
-        flash("Review added", "success")
+        flash("Review added successfully", "success")
 
     db.session.commit()
     return redirect(f"/restaurants/{id}")
@@ -193,9 +192,8 @@ def delete_restaurant(id):
     flash("Restaurant deleted", "danger")
     return redirect("/restaurants")
 
-
 # --------------------
-# My Reviews
+# My Reviews (FIXED)
 # --------------------
 
 @app.route("/my-reviews")
@@ -204,12 +202,14 @@ def my_reviews():
         flash("Please login first", "warning")
         return redirect("/login")
 
-    reviews = Review.query.filter_by(
-        user_id=session["user_id"]
-    ).all()
+    reviews = (
+        Review.query
+        .join(Restaurant)
+        .filter(Review.user_id == session["user_id"])
+        .all()
+    )
 
     return render_template("my_reviews.html", reviews=reviews)
-
 
 # --------------------
 # Auth
@@ -260,7 +260,6 @@ def logout():
     session.clear()
     flash("Logged out", "info")
     return redirect("/")
-
 
 # --------------------
 # Run App

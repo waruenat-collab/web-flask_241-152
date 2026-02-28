@@ -153,6 +153,27 @@ def delete_restaurant(id):
     flash("Restaurant deleted successfully!", "danger")
     return redirect("/restaurants")
 
+@app.route("/register", methods=["GET", "POST"])
+def register():
+    if request.method == "POST":
+        username = request.form["username"]
+        password = request.form["password"]
+
+        if User.query.filter_by(username=username).first():
+            flash("Username already exists", "danger")
+            return redirect("/register")
+
+        user = User(username=username)
+        user.set_password(password)
+
+        db.session.add(user)
+        db.session.commit()
+
+        flash("Register success! Please login.", "success")
+        return redirect("/login")
+
+    return render_template("register.html")
+
 # --------------------
 # Run App
 # --------------------

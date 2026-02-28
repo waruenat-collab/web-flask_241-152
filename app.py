@@ -174,6 +174,31 @@ def register():
 
     return render_template("register.html")
 
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        user = User.query.filter_by(
+            username=request.form["username"]
+        ).first()
+
+        if user and user.check_password(request.form["password"]):
+            session["user_id"] = user.id
+            session["username"] = user.username
+            flash("Login success", "success")
+            return redirect("/restaurants")
+
+        flash("Invalid credentials", "danger")
+        return redirect("/login")
+
+    return render_template("login.html")
+
+
+@app.route("/logout")
+def logout():
+    session.clear()
+    flash("Logged out", "info")
+    return redirect("/")
+
 # --------------------
 # Run App
 # --------------------

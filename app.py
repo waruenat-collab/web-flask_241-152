@@ -1,24 +1,19 @@
 from flask import Flask, render_template, request, redirect, flash, session
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
-from sqlalchemy import func
 import os
 
-# --------------------
-# App Configuration
-# --------------------
 app = Flask(__name__)
 app.secret_key = "day8-secret-key"
 
 basedir = os.path.abspath(os.path.dirname(__file__))
-app.config["SQLALCHEMY_DATABASE_URI"] = \
-    "sqlite:///" + os.path.join(basedir, "food.db")
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + os.path.join(basedir, "food.db")
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
 
 # --------------------
-# Database Models
+# Models
 # --------------------
 
 class Restaurant(db.Model):
@@ -30,16 +25,14 @@ class Restaurant(db.Model):
     reviews = db.relationship(
         "Review",
         backref="restaurant",
-        lazy=True,
-        cascade="all, delete"
+        cascade="all, delete",
+        lazy=True
     )
 
     def avg_rating(self):
         if not self.reviews:
             return None
-        return round(
-            sum(r.rating for r in self.reviews) / len(self.reviews), 1
-        )
+        return round(sum(r.rating for r in self.reviews) / len(self.reviews), 1)
 
 
 class User(db.Model):
@@ -50,8 +43,8 @@ class User(db.Model):
     reviews = db.relationship(
         "Review",
         backref="user",
-        lazy=True,
-        cascade="all, delete"
+        cascade="all, delete",
+        lazy=True
     )
 
     def set_password(self, password):
@@ -65,17 +58,8 @@ class Review(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     rating = db.Column(db.Integer, nullable=False)
 
-    restaurant_id = db.Column(
-        db.Integer,
-        db.ForeignKey("restaurant.id"),
-        nullable=False
-    )
-
-    user_id = db.Column(
-        db.Integer,
-        db.ForeignKey("user.id"),
-        nullable=False
-    )
+    restaurant_id = db.Column(db.Integer, db.ForeignKey("restaurant.id"), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
 
 # --------------------
 # Helper
@@ -92,31 +76,17 @@ def login_required():
 def home():
     return render_template("home.html")
 
-@app.route("/about")
-def about():
-    return render_template("about.html")
-
-@app.route("/contact")
-def contact():
-    return render_template("contact.html")
-
-# --------------------
-# Restaurants
-# --------------------
 
 @app.route("/restaurants")
 def restaurants():
     keyword = request.args.get("q")
 
     if keyword:
-        # 🔍 ค้นหา → แสดงทุกร้านที่ชื่อ match
-        data = Restaurant.query.filter(
+        restaurants = Restaurant.query.filter(
             Restaurant.name.contains(keyword)
         ).all()
     else:
-        # ⭐ ไม่ค้นหา → แสดงทุกร้าน
-        # แต่เรียงร้านที่มีรีวิวขึ้นก่อน
-        data = (
+        restaurants = (
             Restaurant.query
             .outerjoin(Review)
             .group_by(Restaurant.id)
@@ -124,85 +94,13 @@ def restaurants():
             .all()
         )
 
-    return render_template("restaurants.html", restaurants=data)
+    return render_template("restaurants.html", restaurants=restaurants)
 
 
 @app.route("/restaurants/<int:id>")
 def restaurant_detail(id):
     restaurant = Restaurant.query.get_or_404(id)
-    return render_template(
-        "restaurant_detail.html",
-        restaurant=restaurant
-    )
-
-
-@app.route("/add-restaurant", methods=["GET", "POST"])
-def add_restaurant():
-    if not login_required():
-        flash("Please login first", "warning")
-        return redirect("/login")
-
-    if request.method == "POST":
-        restaurant = Restaurant(
-            name=request.form["name"],
-            location=request.form["location"],
-            description=request.form["description"]
-        )
-        db.session.add(restaurant)
-        db.session.commit()
-
-        flash("Restaurant added successfully!", "success")
-        return redirect("/restaurants")
-
-    return render_template("add_restaurant.html")
-
-
-@app.route("/restaurants/<int:id>/edit", methods=["GET", "POST"])
-def edit_restaurant(id):
-    if not login_required():
-        flash("Please login first", "warning")
-        return redirect("/login")
-
-    restaurant = Restaurant.query.get_or_404(id)
-
-    if request.method == "POST":
-        restaurant.name = request.form["name"]
-        restaurant.location = request.form["location"]
-        restaurant.description = request.form["description"]
-        db.session.commit()
-
-        flash("Restaurant updated successfully!", "success")
-        return redirect("/restaurants")
-
-    return render_template(
-        "edit_restaurant.html",
-        restaurant=restaurant
-    )
-
-
-@app.route("/restaurants/<int:id>/delete", methods=["POST"])
-def delete_restaurant(id):
-    if not login_required():
-        flash("Please login first", "warning")
-        return redirect("/login")
-
-    restaurant = Restaurant.query.get_or_404(id)
-
-    # 🗑️ ลบได้เฉพาะคนที่เคยรีวิวร้านนี้
-    user_review = Review.query.filter_by(
-        restaurant_id=id,
-        user_id=session["user_id"]
-    ).first()
-
-    if not user_review:
-        flash("You can delete only restaurants you reviewed", "danger")
-        return redirect("/restaurants")
-
-    db.session.delete(restaurant)
-    db.session.commit()
-
-    flash("Restaurant deleted successfully!", "danger")
-    return redirect("/restaurants")
+    return render_template("restaurant_detail.html", restaurant=restaurant)
 
 
 @app.route("/restaurants/<int:id>/review", methods=["POST"])
@@ -211,36 +109,29 @@ def add_review(id):
         flash("Please login first", "warning")
         return redirect("/login")
 
-    restaurant = Restaurant.query.get_or_404(id)
-    user_id = session["user_id"]
     rating = int(request.form["rating"])
+    user_id = session["user_id"]
 
-    # 🔍 เช็กว่าผู้ใช้เคยรีวิวร้านนี้หรือยัง
     review = Review.query.filter_by(
         restaurant_id=id,
         user_id=user_id
     ).first()
 
     if review:
-        # 🔄 อัปเดตคะแนน
         review.rating = rating
-        flash("Review updated successfully!", "success")
+        flash("Review updated", "success")
     else:
-        # ➕ สร้างรีวิวใหม่
         review = Review(
             rating=rating,
             restaurant_id=id,
             user_id=user_id
         )
         db.session.add(review)
-        flash("Review added successfully!", "success")
+        flash("Review added", "success")
 
     db.session.commit()
     return redirect(f"/restaurants/{id}")
 
-# --------------------
-# My Reviews
-# --------------------
 
 @app.route("/my-reviews")
 def my_reviews():
@@ -252,14 +143,8 @@ def my_reviews():
         user_id=session["user_id"]
     ).all()
 
-    return render_template(
-        "my_reviews.html",
-        reviews=reviews
-    )
+    return render_template("my_reviews.html", reviews=reviews)
 
-# --------------------
-# Auth
-# --------------------
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
@@ -273,11 +158,10 @@ def register():
 
         user = User(username=username)
         user.set_password(password)
-
         db.session.add(user)
         db.session.commit()
 
-        flash("Register success! Please login.", "success")
+        flash("Register success", "success")
         return redirect("/login")
 
     return render_template("register.html")
@@ -286,9 +170,7 @@ def register():
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
-        user = User.query.filter_by(
-            username=request.form["username"]
-        ).first()
+        user = User.query.filter_by(username=request.form["username"]).first()
 
         if user and user.check_password(request.form["password"]):
             session["user_id"] = user.id
@@ -307,9 +189,7 @@ def logout():
     flash("Logged out", "info")
     return redirect("/")
 
-# --------------------
-# Run App
-# --------------------
+
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()

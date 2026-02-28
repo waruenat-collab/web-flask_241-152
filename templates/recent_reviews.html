@@ -2,26 +2,51 @@
 {% block title %}Recent Reviews{% endblock %}
 
 {% block content %}
-<h2 class="mb-4">🕒 Recent Reviews</h2>
 
-<div class="list-group">
+<div class="text-center mb-5">
+  <h2 class="fw-bold">🕒 Recent Reviews</h2>
+  <p class="text-muted">
+    รีวิวล่าสุดจากผู้ใช้งานในระบบ
+  </p>
+</div>
+
+{% if reviews %}
+<div class="list-group shadow-sm">
+
   {% for r in reviews %}
-  <div class="list-group-item d-flex justify-content-between align-items-center">
-    <div>
-      <h6 class="mb-1">
-        <a href="/restaurants/{{ r.restaurant.id }}">
-          {{ r.restaurant.name }}
-        </a>
-      </h6>
-      <small class="text-muted">
-        by {{ r.user.username }}
-      </small>
-    </div>
+  <div class="list-group-item list-group-item-action py-4">
+    <div class="d-flex justify-content-between align-items-start">
 
-    <span class="badge bg-warning text-dark">
-      ⭐ {{ r.rating }}
-    </span>
+      <div>
+        <h5 class="mb-1">
+          <a href="/restaurants/{{ r.restaurant.id }}"
+             class="text-decoration-none fw-bold text-dark">
+            {{ r.restaurant.name }}
+          </a>
+        </h5>
+
+        <p class="mb-1 text-muted">
+          📍 {{ r.restaurant.location }}
+        </p>
+
+        <small class="text-muted">
+          Reviewed by {{ r.user.username }}
+        </small>
+      </div>
+
+      <span class="badge bg-warning text-dark fs-6 px-3 py-2">
+        ⭐ {{ r.rating }}
+      </span>
+
+    </div>
   </div>
   {% endfor %}
+
 </div>
+{% else %}
+<p class="text-muted text-center">
+  No reviews yet.
+</p>
+{% endif %}
+
 {% endblock %}
